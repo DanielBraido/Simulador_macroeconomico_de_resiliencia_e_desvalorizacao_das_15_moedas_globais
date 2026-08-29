@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm
+import matplotlib as mpl
 
 # Configuração da Página
 st.set_page_config(
@@ -57,9 +57,8 @@ else:
     
     fig, ax = plt.subplots(figsize=(10, 5))
     
-    # Geração de paleta dinâmica para evitar erro de limite de cores
     num_moedas = len(tickers_selecionados)
-    colormap = cm.get_cmap("tab20" if num_moedas <= 20 else "gist_ncar", max(num_moedas, 1))
+    colormap = mpl.colormaps["tab20" if num_moedas <= 20 else "gist_ncar"]
 
     for idx, ticker in enumerate(tickers_selecionados):
         dados = moedas_dict[ticker]
