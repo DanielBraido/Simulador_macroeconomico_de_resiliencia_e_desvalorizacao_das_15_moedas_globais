@@ -113,4 +113,4 @@ else:
             medalhas.append(f"{i+1}º Lugar")
             
     df_analise.insert(0, "Ranking", medalhas)
-    st.dataframe(df_analise, use_container_width=True)
+    st.dataframe(df_analise, use_container_width=True, hide_index=True)
