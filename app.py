@@ -79,7 +79,38 @@ else:
     st.pyplot(fig)
 
     st.markdown("---")
-    st.subheader("Ranking e Resumo Final do Período (Ano 30)")
-    df_resumo = df_resultado.iloc[[-1]].T.rename(columns={df_resultado.index[-1]: "Poder de Compra Final"})
-    df_resumo = df_resumo.sort_values(by="Poder de Compra Final", ascending=False)
-    st.dataframe(df_resumo)
+    st.subheader("🏆 Ranking de Resiliência Monetária e Análise de Perdas")
+    
+    dados_tabela = []
+    for ticker in tickers_selecionados:
+        dados = moedas_dict[ticker]
+        taxa_dep = dados["inflacao_base"] + (0.02 * (dados["div_pib"] / 100.0) * (1.0 - dados["f_esc"]))
+        poder_final = patrimonio_inicial * ((1 - (taxa_dep / 100.0)) ** anos_projecao)
+        perda_absoluta = patrimonio_inicial - poder_final
+        perda_percentual = (perda_absoluta / patrimonio_inicial) * 100
+        
+        dados_tabela.append({
+            "Ticker": ticker,
+            "Moeda": dados['nome'],
+            "Tier": dados['tier'],
+            "Poder de Compra Restante (R$)": round(poder_final, 2),
+            "Prejuízo Absoluto (R$)": round(perda_absoluta, 2),
+            "Corrosão Patrimonial (%)": round(perda_percentual, 2)
+        })
+    
+    df_analise = pd.DataFrame(dados_tabela).sort_values(by="Poder de Compra Restante (R$)", ascending=False).reset_index(drop=True)
+    
+    # Adicionando os selos de premiação nas 3 primeiras posições
+    medalhas = []
+    for i in range(len(df_analise)):
+        if i == 0:
+            medalhas.append("🥇 1º Lugar (Ouro)")
+        elif i == 1:
+            medalhas.append("🥈 2º Lugar (Prata)")
+        elif i == 2:
+            medalhas.append("🥉 3º Lugar (Bronze)")
+        else:
+            medalhas.append(f"{i+1}º Lugar")
+            
+    df_analise.insert(0, "Ranking", medalhas)
+    st.dataframe(df_analise, use_container_width=True)
